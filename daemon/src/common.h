@@ -34,7 +34,6 @@ struct write_event {  // realistically at least size 11
 struct shell {
   pid_t shell_pid;
   long indicator;
-  char omit_write;
   char ***environ_address;
   char terminal[8];
   char terminal_len;

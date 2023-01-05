@@ -1,6 +1,6 @@
 DESTDIR =
 
-build: build-daemon build-cli
+build: build-daemon
 
 build-daemon:
 	clang -Wall -g -O2 -target bpf -D__TARGET_ARCH_x86 -c daemon/src/nhi.bpf.c -o nhi.bpf.o
@@ -8,9 +8,6 @@ build-daemon:
 	clang -Wall -c daemon/src/utils.c -o utils.o
 	clang -Wall -c daemon/src/sqlite.c -o sqlite.o
 	clang -Wall nhi.o utils.o sqlite.o -lbpf -lelf -lz -lsqlite3 -o nhid
-
-build-cli:
-	GOCACHE=/tmp/gocache bash -c 'go build -o nhi main.go'
 
 install: install-nhid install-shells install-nhi install-db install-service
 
@@ -27,9 +24,9 @@ install-shells:
 	cp shell/nhi.zsh $(DESTDIR)/etc/nhi
 
 install-nhi:
-	chmod 755 nhi
+	chmod 755 ./cli/cli.py
 	mkdir -p $(DESTDIR)/usr/bin
-	cp nhi $(DESTDIR)/usr/bin
+	cp ./cli/cli.py $(DESTDIR)/usr/bin/nhi
 
 install-db:
 	mkdir -p $(DESTDIR)/var/nhi
@@ -48,9 +45,6 @@ build-test-daemon:
 	clang -Wall -c daemon/src/utils.c -o utils.o
 	clang -Wall -D TEST -c daemon/src/sqlite.c -o sqlite.o
 	clang -Wall nhi.o utils.o sqlite.o -lbpf -lelf -lz -lsqlite3 -o nhid
-
-build-test-cli:
-	go build -o nhi -tags TEST main.go
 
 create-test-db:
 	touch testing/db
