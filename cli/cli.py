@@ -32,8 +32,8 @@ def get_log_str(logs, index):
 
 def get_ps1(log):
     time = log["start_time"]
-    time_log = datetime.datetime.fromtimestamp(time).strftime('%Y-%m-%d %H:%M:%S')
-    return f"({time_log}) {log['PS1'].decode()}"
+    time_log = datetime.datetime.utcfromtimestamp(time).strftime('%Y-%m-%d %H:%M:%S')
+    return f"{time_log} (UTC) {log['PWD'].decode()}$ "
 
 def pager_print(output):
     pager = subprocess.Popen(["less", "-R"], stdin=subprocess.PIPE)

@@ -8,6 +8,7 @@ build-daemon:
 	clang -Wall -c daemon/src/utils.c -o utils.o
 	clang -Wall -c daemon/src/sqlite.c -o sqlite.o
 	clang -Wall nhi.o utils.o sqlite.o -lbpf -lelf -lz -lsqlite3 -o nhid
+	cp ./cli/cli.py ./nhi
 
 install: install-nhid install-shells install-nhi install-db install-service
 
@@ -52,3 +53,13 @@ create-test-db:
 
 format:
 	astyle --style=otbs --indent=spaces=2 *.c *.h --recursive --exclude=vendor && go fmt ./...
+
+release:
+	mkdir -p ./release
+	cp ./shell/nhi.bash ./release
+	cp ./shell/nhi.zsh ./release
+	cp ./nhi ./release
+	cp ./install ./release
+	cp ./nhi.bpf.o ./release
+	cp ./nhid ./release
+	cp ./nhid.service ./release

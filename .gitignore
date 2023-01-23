@@ -3,6 +3,7 @@ nhid
 nhi
 
 testing/db*
+release/
 
 *.log
 
