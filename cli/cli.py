@@ -47,7 +47,8 @@ def main():
 
     tables = get_tables(conn)
     logs = get_logs(conn, tables)
-    commands = [(index, value["command"].decode()) for (index, value) in zip(range(len(logs)), logs)]
+    # remove CRLF for fzf
+    commands = [(index, value["command"].decode().replace("\n", " ").replace("\r", " ")) for (index, value) in zip(range(len(logs)), logs)]
     commands = [f"{index} {command}" for (index, command) in commands]
     logs_selected = iterfzf(commands[::-1], multi=True)
     if logs_selected != None:
