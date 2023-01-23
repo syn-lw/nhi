@@ -2,13 +2,13 @@
 
 pip3 install iterfzf
 
-chmod 755 nhi
+chmod 700 nhi
 cp nhi /usr/bin
 
 mkdir -p /var/nhi
-chmod 777 /var/nhi
+chmod 700 /var/nhi
 touch /var/nhi/db
-chmod 777 /var/nhi/db
+chmod 700 /var/nhi/db
 sqlite3 /var/nhi/db "PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS meta (indicator INTEGER, name TEXT, start_time INTEGER, finish_time INTEGER);"
 
 mkdir -p /etc/nhi
@@ -23,7 +23,7 @@ if [[ -e ~/.zshrc ]]; then
   echo source /etc/nhi/nhi.zsh >> ~/.zshrc
 fi
 
-chmod 755 nhid
+chmod 700 nhid
 cp nhid /usr/bin
 
 cp nhid.service /etc/systemd/system
