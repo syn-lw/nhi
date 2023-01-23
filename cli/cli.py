@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import sqlite3
 import datetime
+import subprocess
 from iterfzf import iterfzf
 
 def get_tables(conn):
@@ -20,20 +21,23 @@ def get_logs(conn, tables):
         list_of_logs.extend(cursor.fetchall())
     return list(filter(lambda x: x["command"] != None, list_of_logs))
 
-def print_log(logs, index):
+def get_log_str(logs, index):
     log = logs[index]
     command_line = f"{get_ps1(log)}{log['command'].decode()}"
-    print(command_line)
-    #print(log["output"])
     try:
-        print(log["output"].decode())
+        output = f"{command_line}\n{log['output'].decode()}"
     except:
-        print(log["output"])
+        output = f"{command_line}\n{repr(log['output'])}"
+    return output
 
 def get_ps1(log):
     time = log["start_time"]
     time_log = datetime.datetime.fromtimestamp(time).strftime('%Y-%m-%d %H:%M:%S')
     return f"({time_log}) {log['PS1'].decode()}"
+
+def pager_print(output):
+    pager = subprocess.Popen(["less", "-R"], stdin=subprocess.PIPE)
+    pager.communicate(input=output.encode())
 
 def main():
     conn = sqlite3.connect('/var/nhi/db')
@@ -45,9 +49,13 @@ def main():
     logs = get_logs(conn, tables)
     commands = [(index, value["command"].decode()) for (index, value) in zip(range(len(logs)), logs)]
     commands = [f"{index} {command}" for (index, command) in commands]
-    index = int(iterfzf(commands).split(" ")[0])
+    logs_selected = iterfzf(commands[::-1], multi=True)
+    if logs_selected != None:
+        logs_index = map(int, [selection.split(" ")[0] for selection in logs_selected])
+        logs_index = sorted(logs_index)
 
-    print_log(logs, index)
+        full_output = "\n\n".join([get_log_str(logs, i) for i in logs_index])
+        pager_print(full_output)
 
 if __name__ == '__main__':
     main()
